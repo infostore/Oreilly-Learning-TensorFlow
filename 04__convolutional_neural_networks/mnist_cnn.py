@@ -14,17 +14,23 @@ mnist = input_data.read_data_sets(DATA_DIR, one_hot=True)
 x = tf.placeholder(tf.float32, shape=[None, 784])
 y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
+# 2차원 이미지로 재구성 - 공간적 의미의 활용 - CNN에서 중요
 x_image = tf.reshape(x, [-1, 28, 28, 1])
+# 5*5 합성곱, 32개의 특징 매
 conv1 = conv_layer(x_image, shape=[5, 5, 1, 32])
+# 14*14로 축소
 conv1_pool = max_pool_2x2(conv1)
 
 conv2 = conv_layer(conv1_pool, shape=[5, 5, 32, 64])
+# 7 * 7로 축소
 conv2_pool = max_pool_2x2(conv2)
 
+# 완전 연결 계층에서는 공간적 의미가 필요없음
 conv2_flat = tf.reshape(conv2_pool, [-1, 7*7*64])
 full_1 = tf.nn.relu(full_layer(conv2_flat, 1024))
 
 keep_prob = tf.placeholder(tf.float32)
+# 일반화 강화 - 학습할 때만 사용
 full1_drop = tf.nn.dropout(full_1, keep_prob=keep_prob)
 
 y_conv = full_layer(full1_drop, 10)
